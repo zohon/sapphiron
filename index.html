@@ -239,7 +239,7 @@
             justify-content: flex-end;
             align-items: flex-end;
         }
-        
+
         .tooltip {
             position: absolute;
             z-index: 200;
@@ -281,7 +281,7 @@
         const tooltip = document.querySelector('.tooltip');
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-        let listPerso = JSON.parse(decodeURI(urlParams.get('persos')))
+        let listPerso = JSON.parse(urlParams.get('persos'))
         if(!listPerso) {
             listPerso = [];
         }
@@ -308,6 +308,10 @@
                 console.log(grpIndex, posIngrp);
                 const target = document.querySelector(`.grp:nth-child(${grpIndex}) .perso:nth-child(${posIngrp})`);
                 activeTarget(target);
+            })
+
+            grpinput.addEventListener('mouseout', () => {
+                activeTarget();
             })
             
             divgrpinput.append(grpinput)
@@ -341,7 +345,7 @@
                 }
             }
 
-            insertParam('persos', encodeURI(JSON.stringify(jsonData)));
+            window.history.replaceState(null, null, `?persos=${JSON.stringify(jsonData)}`);
         }
 
         document.getElementsByTagName("BODY")[0].append(grpInputs)
@@ -376,10 +380,9 @@
                     }, false);
 
                     persoDiv.addEventListener("mouseout", function( event ) {
-                    tooltip.innerHTML = "";
-
-                    tooltip.style.left = event.clientX+ "px";
-                    tooltip.style.top = event.clientY+ "px";
+                        tooltip.innerHTML = "";
+                        tooltip.style.left = event.clientX+ "px";
+                        tooltip.style.top = event.clientY+ "px";
                     }, false);
 
                 grpDiv.append(persoDiv);
