@@ -134,8 +134,11 @@
         const tooltip = document.querySelector('.tooltip');
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-        const listPerso = JSON.parse(decodeURI(urlParams.get('persos')))
-        console.log();
+        let listPerso = JSON.parse(decodeURI(urlParams.get('persos')))
+        if(!listPerso) {
+            listPerso = [];
+        }
+
 
         const grpInputs = document.createElement('div');
         grpInputs.className = "inputs";
