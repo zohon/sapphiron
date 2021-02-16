@@ -69,6 +69,10 @@
             justify-content: center;
         }
 
+        .perso.active {
+            border: 2px solid yellow;
+        }
+
         .perso:nth-child(0) {
             background-color : red;
         }
@@ -112,8 +116,130 @@
             flex-flow: column wrap;
         }
         .inputs input {
-            width : 140px;
+            width : 118px;
+            background-color: black;
+            border:none;
+            padding: 3px 0;
+            border-bottom: 1px solid #ffffff;
+            color:#ffffff;
         }
+
+        .inputs div {
+            display: flex;
+            position: relative;
+        }
+
+
+
+
+        .inputs div:before {
+           content: attr(data-info);
+           padding: 0 3px;
+           width: 16px;
+           height: calc(100%-1px);
+           color:white;
+           display:flex;
+           justify-content: flex-end;
+           align-items: flex-end;
+           border-bottom: 1px solid #ffffff;
+        }
+
+        .inputs div:nth-child(1):after {
+            content: 'Group 1';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .inputs div:nth-child(6):after {
+            content: 'Group 2';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .inputs div:nth-child(11):after {
+            content: 'Group 3';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .inputs div:nth-child(16):after {
+            content: 'Group 4';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .inputs div:nth-child(21):after {
+            content: 'Group 5';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .inputs div:nth-child(26):after {
+            content: 'Group 6';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .inputs div:nth-child(31):after {
+            content: 'Group 7';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+
+        .inputs div:nth-child(36):after {
+            content: 'Group 8';
+            left: 0;
+            top: -25px;
+            position: absolute;
+            padding: 0 3px;
+            color: white;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+        
         .tooltip {
             position: absolute;
             z-index: 200;
@@ -126,11 +252,32 @@
             display: none;
         }
 
+        .search {
+            left: calc(50% - 620px);
+            bottom: calc(50% - 246px);
+            position: absolute;
+            z-index:100;
+            width: 100%;
+        }
+
+        .search input{width: 1233px;}
+
     </style>
 </head>
 <body>
+    <div class="search"><input></input></div>
     <div class="tooltip"></div>
     <script>
+
+
+        document.querySelector(`.search input`).addEventListener('keyup', (event) => {
+            if(event.target.value) {
+                const targetPerso = document.querySelector(`.perso[title^="${event.target.value}"]`);
+                console.log('change', event.target.value, targetPerso)
+                activeTarget(targetPerso);
+            }
+        })
+
         const tooltip = document.querySelector('.tooltip');
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
@@ -143,8 +290,11 @@
         const grpInputs = document.createElement('div');
         grpInputs.className = "inputs";
         for (let i = 0; i < 40; i++) {
+            const divgrpinput = document.createElement('div');
+            divgrpinput.dataset.info = (i+1);
             const grpinput = document.createElement('input');
             grpinput.placeholder = "pos "+ (i+1);
+
             if(listPerso[i]) {
                 grpinput.value = listPerso[i];
             }
@@ -152,7 +302,27 @@
                 listenCHange();
             })
 
-            grpInputs.append(grpinput)
+            grpinput.addEventListener('mousemove', () => {
+                const grpIndex = Math.floor(i/5) +1;
+                const posIngrp = (i+1) - ((grpIndex-1)*5);
+                console.log(grpIndex, posIngrp);
+                const target = document.querySelector(`.grp:nth-child(${grpIndex}) .perso:nth-child(${posIngrp})`);
+                activeTarget(target);
+            })
+            
+            divgrpinput.append(grpinput)
+            grpInputs.append(divgrpinput)
+        }
+
+        const activeTarget = (target) => {
+            const active = document.querySelector(`.perso.active`);
+            if(active) {
+                active.classList.remove('active');
+            }
+
+            if(target) {
+                target.classList.add('active');
+            }
         }
 
         const listenCHange = () => {
