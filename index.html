@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body, html {
+            width: 100%;
+            display: flex;
+            height: 100%;
+            color: white;
+        }
+        body {
+            background:black;
+            background-image: url(sapphiron-map.jpg);
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        .center {
+            margin: auto;
+            width: 1240px;
+            height: 450px;
+            overflow: hidden;
+            position: relative;
+        }
+        .grp {
+            left:50%;
+            top:50%;
+            position:absolute;
+            transform-origin: 50px 50px;
+            transform-origin: 83px 0px;
+            transform: rotateZ(0deg);
+        }
+
+        .grp:nth-child(1) {
+            transform: rotateZ(294deg);
+        }
+        .grp:nth-child(2) {
+            transform: rotateZ(261deg);
+        }
+        .grp:nth-child(3) {
+            transform: rotateZ(231deg);
+        }
+        .grp:nth-child(4) {
+            transform: rotateZ(201deg);
+        }
+        .grp:nth-child(5) {
+            transform: rotateZ(169deg);
+        }
+        .grp:nth-child(6) {
+            transform: rotateZ(141deg);
+        }
+        .grp:nth-child(7) {
+            transform: rotateZ(113deg);
+        }
+        .grp:nth-child(8) {
+            transform: rotateZ(80deg);
+        }
+        .perso {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background-color:red;
+            position:absolute;
+            display: flex;
+            justify-content: center;
+        }
+
+        .perso:nth-child(0) {
+            background-color : red;
+        }
+
+        .perso:nth-child(2) {
+            transform: translateX(-30px) translateY(15px);
+            background-color : green;
+        }
+
+        .perso:nth-child(3) {
+            transform: translateX(-30px) translateY(-15px);
+            background-color : green;
+        }
+
+        .perso:nth-child(4) {
+            transform: translateX(-60px) translateY(20px);
+            background-color : white;
+            color: black;
+        }
+
+        .perso:nth-child(5) {
+            transform: translateX(-60px) translateY(-20px);
+            background-color : white;
+            color: black;
+        }
+
+        .perso.inactive {
+            background-color: grey;
+            color: black;
+        }
+
+        .inputs {
+            left: calc(50% - 620px);
+            top: calc(50% - 360px);
+            position: absolute;
+            z-index: 100;
+            width: 1250px;
+            height: 125px;
+            display: flex;
+            flex-direction: column;
+            flex-flow: column wrap;
+        }
+        .inputs input {
+            width : 140px;
+        }
+        .tooltip {
+            position: absolute;
+            z-index: 200;
+            background: black;
+            padding: 3px 5px;
+            margin-left: 10px;
+        }
+
+        .tooltip:empty {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="tooltip"></div>
+    <script>
+        const tooltip = document.querySelector('.tooltip');
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const listPerso = JSON.parse(decodeURI(urlParams.get('persos')))
+        console.log();
+
+        const grpInputs = document.createElement('div');
+        grpInputs.className = "inputs";
+        for (let i = 0; i < 40; i++) {
+            const grpinput = document.createElement('input');
+            grpinput.placeholder = "pos "+ (i+1);
+            if(listPerso[i]) {
+                grpinput.value = listPerso[i];
+            }
+            grpinput.addEventListener('change', () => {
+                listenCHange();
+            })
+
+            grpInputs.append(grpinput)
+        }
+
+        const listenCHange = () => {
+            const allinputs = document.querySelectorAll('.inputs input');
+            const jsonData = [];
+
+            for (var i = 0; i < allinputs.length; i++) {
+                const  input = allinputs[i];
+                jsonData.push(input.value);
+                if(input.value) {
+                    const grpIndex = Math.floor(i/5)
+                    const posIngrp = (i+1) - (grpIndex*5);
+                    const target = document.querySelector(`.grp:nth-child(${grpIndex+1}) .perso:nth-child(${posIngrp})`);
+                    target.title = input.value;
+                    target.className = "perso";
+                }
+            }
+
+            insertParam('persos', encodeURI(JSON.stringify(jsonData)));
+        }
+
+        document.getElementsByTagName("BODY")[0].append(grpInputs)
+
+        const allDivs = document.createElement('div');
+        allDivs.className = "center";
+        for (let grpID = 1; grpID <= 8; grpID++) {
+            const grpDiv = document.createElement('div');
+            grpDiv.className = "grp";
+            const id = `group_${grpID}`;
+            grpDiv.id = id;
+            for (let persoID = 1; persoID <= 5; persoID++) {
+                const persoDiv = document.createElement('div');
+                const persoInfo = listPerso[persoID + ((grpID-1)*5) -1];
+                persoDiv.className = "perso"+ (!persoInfo? " inactive": "");
+                const id = `group_${grpID}_pos_${persoID}`;
+                persoDiv.id = id;
+                // persoDiv.setAttribute("style", `transform: translateY(${perso*20}px) translateX(${grp*20}px) rotate(90deg);`);
+                
+                
+                persoDiv.title = persoInfo
+                persoDiv.innerHTML = persoID + ((grpID-1)*5);
+
+                persoDiv.addEventListener("mousemove", function( event ) {
+                    if(event.target.title) {
+                    tooltip.innerHTML = event.target.title;
+
+                    tooltip.style.left = event.clientX+ "px";
+                    tooltip.style.top = event.clientY+ "px";
+                    }
+
+                    }, false);
+
+                    persoDiv.addEventListener("mouseout", function( event ) {
+                    tooltip.innerHTML = "";
+
+                    tooltip.style.left = event.clientX+ "px";
+                    tooltip.style.top = event.clientY+ "px";
+                    }, false);
+
+                grpDiv.append(persoDiv);
+            }
+        allDivs.append(grpDiv);
+        }
+        document.getElementsByTagName("BODY")[0].append(allDivs)
+
+
+        function insertParam(key, value) {
+    key = encodeURIComponent(key);
+    value = encodeURIComponent(value);
+
+    // kvp looks like ['key1=value1', 'key2=value2', ...]
+    var kvp = document.location.search.substr(1).split('&');
+    let i=0;
+
+    for(; i<kvp.length; i++){
+        if (kvp[i].startsWith(key + '=')) {
+            let pair = kvp[i].split('=');
+            pair[1] = value;
+            kvp[i] = pair.join('=');
+            break;
+        }
+    }
+
+    if(i >= kvp.length){
+        kvp[kvp.length] = [key,value].join('=');
+    }
+
+    // can return this or...
+    let params = kvp.join('&');
+
+    // reload page with new params
+    document.location.search = params;
+}
+
+    </script>
+</body>
+</html>
